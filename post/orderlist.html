@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Order List</title>
+</head>
+<body>
+    <h1>Order List</h1>
+    <table id="orderTable" border="1">
+        <thead>
+            <tr>
+                <th>Product ID</th>
+                <th>Order Date</th>
+            </tr>
+        </thead>
+        <tbody>
+            <%
+                String jdbcUrl = "jdbc:mariadb://localhost:3306/yourdatabase";
+                String dbId = "yourusername";
+                String dbPwd = "yourpassword";
+                Connection connection = null;
+                Statement statement = null;
+                ResultSet resultSet = null;
+
+                try {
+                    // MariaDB 드라이버 로드
+                    Class.forName("org.mariadb.jdbc.Driver");
+                    connection = DriverManager.getConnection(jdbcUrl, dbId, dbPwd);
+                    statement = connection.createStatement();
+
+                    // SQL 쿼리 실행
+                    String sql = "SELECT product_id, order_date FROM orders";
+                    resultSet = statement.executeQuery(sql);
+
+                    // 테이블에 데이터 추가
+                    while (resultSet.next()) {
+                        String productId = resultSet.getString("product_id");
+                        String orderDate = resultSet.getString("order_date");
+
+                        out.println("<tr><td>" + productId + "</td><td>" + orderDate + "</td></tr>");
+                    }
+
+                } catch (Exception ex) {
+                    out.println("<tr><td colspan='2'>Error: " + ex.getMessage() + "</td></tr>");
+                } finally {
+                    try {
+                        if (resultSet != null) resultSet.close();
+                        if (statement != null) statement.close();
+                        if (connection != null) connection.close();
+                    } catch (SQLException e) {
+                        out.println("<tr><td colspan='2'>Error closing resources: " + e.getMessage() + "</td></tr>");
+                    }
+                }
+            %>
+        </tbody>
+    </table>
+</body>
+</html>
+
